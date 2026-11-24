@@ -28,6 +28,7 @@
 #include "cpu_vendorid.h"
 #include "target/riscv/tcg/csr.h"
 #include "internals.h"
+#include "time_helper.h"
 #include "qapi/error.h"
 #include "qapi/qapi-builtin-type-infos.h"
 #include "qapi/visitor.h"
@@ -1345,6 +1346,12 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
         error_propagate(errp, local_err);
         return;
     }
+
+#ifndef CONFIG_USER_ONLY
+    if (!kvm_enabled() && cpu->cfg.ext_sstc) {
+        riscv_timer_init(cpu);
+    }
+#endif
 
     riscv_cpu_register_gdb_regs_for_features(cs);
 
@@ -3935,6 +3942,59 @@ static const TypeInfo riscv_cpu_type_infos[] = {
     DEFINE_PROFILE_CPU(TYPE_RISCV_CPU_RVA22S64,  TYPE_RISCV_CPU_RV64I,  RVA22S64),
     DEFINE_PROFILE_CPU(TYPE_RISCV_CPU_RVA23U64,  TYPE_RISCV_CPU_RV64I,  RVA23U64),
     DEFINE_PROFILE_CPU(TYPE_RISCV_CPU_RVA23S64,  TYPE_RISCV_CPU_RV64I,  RVA23S64),
+
+    DEFINE_RISCV_CPU(TYPE_RISCV_CPU_SPACEMIT_X100,
+                     TYPE_RISCV_VENDOR_CPU,
+        .misa_mxl_max = MXL_RV64,
+        .misa_ext = RVI | RVM | RVA | RVF | RVD | RVC | RVB | RVS | RVU | RVV,
+        .priv_spec = PRIV_VERSION_1_13_0,
+        .cfg.mmu = true,
+        .cfg.pmp = true,
+        .cfg.vlenb = 256 >> 3,
+        .cfg.max_satp_mode = VM_1_10_SV39,
+        .cfg.marchid = 0,
+        /* RVA22U64 */
+        .cfg.ext_zicsr = true,
+        .cfg.ext_zihintpause = true,
+        .cfg.ext_zba = true,
+        .cfg.ext_zbb = true,
+        .cfg.ext_zbs = true,
+        .cfg.ext_zfhmin = true,
+        .cfg.ext_zkt = true,
+        .cfg.ext_zicntr = true,
+        .cfg.ext_zihpm = true,
+        .cfg.ext_zicbom = true,
+        .cfg.ext_zicbop = true,
+        .cfg.ext_zicboz = true,
+        .cfg.ext_zicclsm = true,
+        .cfg.ext_zic64b = true,
+        /* RVA22S64 */
+        .cfg.ext_zifencei = true,
+        .cfg.ext_svpbmt = true,
+        .cfg.ext_svinval = true,
+        .cfg.ext_svade = true,
+        /* RVA23U64 */
+        .cfg.ext_zvfhmin = true,
+        .cfg.ext_zvbb = true,
+        .cfg.ext_zvkt = true,
+        .cfg.ext_zihintntl = true,
+        .cfg.ext_zicond = true,
+        .cfg.ext_zimop = true,
+        .cfg.ext_zcmop = true,
+        .cfg.ext_zcb = true,
+        .cfg.ext_zfa = true,
+        .cfg.ext_zawrs = true,
+        .cfg.ext_supm = true,
+        /* RVA23S64 */
+        .cfg.ext_svnapot = true,
+        .cfg.ext_sstc = true,
+        .cfg.ext_sscofpmf = true,
+        .cfg.ext_ssnpm = true,
+        .cfg.ext_sha = true,
+        /* K3 additions */
+        .cfg.ext_smaia = true,
+        .cfg.ext_ssaia = true,
+    ),
 #endif /* TARGET_RISCV64 */
 };
 

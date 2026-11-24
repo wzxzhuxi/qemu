@@ -1364,10 +1364,6 @@ static bool riscv_tcg_cpu_realize(CPUState *cs, Error **errp)
 
     tcg_cflags_set(CPU(cs), CF_PCREL);
 
-    if (cpu->cfg.ext_sstc) {
-        riscv_timer_init(cpu);
-    }
-
     /* With H-Ext, VSSIP, VSTIP, VSEIP and SGEIP are hardwired to one. */
     if (riscv_has_ext(env, RVH)) {
         env->mideleg = MIP_VSSIP | MIP_VSTIP | MIP_VSEIP | MIP_SGEIP;
