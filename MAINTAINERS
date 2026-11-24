@@ -1902,6 +1902,13 @@ F: tests/qtest/k230-wdt-test.c
 F: tests/qtest/k230-gsdma-test.c
 F: tests/qtest/k230-decomp-gzip-test.c
 
+SpacemiT K3 Pico-ITX
+M: Chao Liu <chao.liu@processmission.com>
+L: qemu-riscv@nongnu.org
+S: Maintained
+F: hw/riscv/spacemit-k3.c
+F: include/hw/riscv/spacemit-k3.h
+
 Milk-V Duo
 M: Kuan-Wei Chiu <visitorckw@gmail.com>
 S: Maintained
